@@ -1,0 +1,38 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: navajowhite;
+}
+#log-text{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: larger;
+    color: darkblue;
+}
+#field {
+    width: 800px;
+    height: 800px;
+    display: grid;
+    /*grid-template-columns: repeat(3, 1fr);*/
+    /*grid-template-rows: repeat(3, 1fr);*/
+    gap: 2px;
+    background-color: #333;
+    border: 2px solid #333;
+}
+
+.cell {
+    background-color: white;
+    border: none;
+    font-size: 3rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.cell:disabled {
+    opacity: 0.75;
+}
+.cell:hover {
+    background-color: #e0e0e0;
+}
