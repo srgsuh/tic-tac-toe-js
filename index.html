@@ -1,18 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Noughts and Crosses</title>
-    <link rel="stylesheet" href="./style/style.css">
-    <script src="./script/game.js" defer></script>
-    <script src="./script/script.js" defer></script>
-</head>
-<body>
-<div class = "container">
-    <p id = "log-text"></p>
-    <div id="field">
-
-    </div>
-</div>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <title>Noughts and Crosses</title>
+        <link rel="stylesheet" href="./style/style.css">
+        <script src="./script/game.js" defer></script>
+        <script src="./script/script.js" defer></script>
+    </head>
+    <body>
+        <div class = "container">
+            <div class="board-size-selector">
+                <label for="board-size">Select Tic-Tac-Toe Board Size:</label>
+                <select id="board-size" name="board-size">
+                    <option value="3">3×3 (Standard)</option>
+                    <option value="4">4×4</option>
+                    <option value="5">5×5</option>
+                    <option value="6">6×6</option>
+                    <option value="7">7×7</option>
+                    <option value="8">8×8</option>
+                </select>
+            </div>
+            <button id = "new-game">New game</button>
+            <p id = "log-text"></p>
+            <div id="field"></div>
+        </div>
+    </body>
 </html>

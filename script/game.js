@@ -1,65 +1,95 @@
-const BLANK = '';
+'use strict';
+const PLAYER_SYMBOLS = {
+    X: 'X',
+    O: 'O',
+    BLANK: ''
+};
+
+class GameState {
+    constructor(gameEnd = false, winner = null, winningCells = null) {
+        this.gameEnd = gameEnd;
+        this.winner = winner;
+        this.winningCells = winningCells;
+    }
+}
+
+const GAME_CONTINUES = new GameState(), GAME_DRAW = new GameState(true);
+
+/**
+ * @class
+ * @property {number} size
+ * @property {Array<Array<string>>} field
+ * @property {number} emptyCells
+ * @property {string} currentPlayer
+ * @property {string} idlePlayer
+ */
+
 class TicTacToe {
+    size;
+    field;
+    emptyCells;
+    currentPlayer;
+    idlePlayer;
+    
     constructor(fieldSize = 3) {
-        this.winSize = fieldSize;
+        if (!Number.isInteger(fieldSize) || fieldSize < 3) {
+            throw new Error('Field size must be integer ≥ 3');
+        }
         this.init(fieldSize);
     }
-
     init(fieldSize) {
         this.size = fieldSize;
         this.emptyCells = this.size * this.size
-        this.field = Array.from({length: this.size}, () => Array(this.size).fill(BLANK));
-        this.currentPlayer = 'X';
-        this.idlePlayer = 'O';
+        this.field = Array.from({length: this.size}, () => Array(this.size).fill(PLAYER_SYMBOLS.BLANK));
+        [this.currentPlayer, this.idlePlayer] = [PLAYER_SYMBOLS.X, PLAYER_SYMBOLS.O];
     }
-
-    changePlayer () {
+    switchPlayers () {
         [this.currentPlayer, this.idlePlayer] = [this.idlePlayer, this.currentPlayer];
     }
-
-    // Returns true if the move ends the game (win or draw)
-    move(row, col, onMove, onGameEnd) {
-        if (row < 0 || row >= this.size || col < 0 || col >= this.size || this.field[row][col] !== BLANK) {
-            return false;
-        }
-        onMove(this.currentPlayer, this.idlePlayer);
+    makeMove(row, col) {
+        if (!this.isValidMove(row, col)) return null;
         this.field[row][col] = this.currentPlayer;
-        --this.emptyCells;
-        if (this.checkWinner(row, col, this.currentPlayer)) {
-            onGameEnd(this.currentPlayer);
-            return true;
+        this.emptyCells--;
+        const result = this.checkGameEndCondition(row, col, this.currentPlayer);
+        if (!result.gameEnd) this.switchPlayers();
+        return result;
+    }
+    /**
+     * Determines if the current move results in a game-ending condition (win or draw)
+     * by checking all possible winning lines (row, column, both diagonals) and board fullness.
+     * @param {number} rowId - 0-based row index of the current move
+     * @param {number} colId - 0-based column index of the current move
+     * @param {string} player - Current player's symbol ('X' or 'O')
+     * @returns {Object} Result object with:
+     *   - gameEnd: {boolean} Whether the game has concluded
+     *   - winner: {string|null} Winning player symbol (null if draw)
+     *   - winningCells: {Array|null} Coordinates of winning cells [row,col][]
+     */
+    checkGameEndCondition(rowId, colId, player) {
+        const size = this.size, field = this.field;
+        const hasRowWin = field[rowId].every(cell => cell === player);
+        const hasColWin = !hasRowWin && field.every(row => row[colId] === player);
+        const hasMainDiagWin = !hasColWin && rowId === colId &&
+            field.every((row, i) => row[i] === player);
+        const hasAntiDiagWin = !hasMainDiagWin && rowId + colId === size - 1 &&
+            field.every((row, i) => row[size - 1 - i] === player);
+        if (!(hasRowWin || hasColWin || hasMainDiagWin || hasAntiDiagWin)) {
+            return (this.emptyCells > 0)?GAME_CONTINUES: GAME_DRAW;
         }
-        if (this.emptyCells === 0) {
-            onGameEnd(null);
-            return true;
-        }
-        this.changePlayer();
-        return false;
-    };
-
-    checkWinner(rowIndex, colIndex, player) {
-        //Counts the maximum consecutive occurrences of a value in an array.
-        function countMax(vector, value) {
-            let max = 0, current = 0;
-            for (let i = 0; i < vector.length; i++) {
-                current = (vector[i] === value)? current + 1 : 0;
-                max = Math.max(max, current);
-            }
-            return max;
-        }
-        let vector;
-        vector = this.field[rowIndex];
-        if (countMax(vector, player) >= this.winSize) return true;
-        vector = this.field.flatMap((row) => row[colIndex]);
-        if (countMax(vector, player) >= this.winSize) return true;
-        if (rowIndex === colIndex) {
-            vector = this.field.flatMap( (row, idx) => row[idx]);
-            if (countMax(vector, player) >= this.winSize) return true;
-        }
-        if (rowIndex + colIndex === this.size - 1) {
-            vector = this.field.flatMap( (row, idx) => row[this.size - 1 -idx]);
-            if (countMax(vector, player) >= this.winSize) return true;
-        }
-        return false;
+        return new GameState(true, player, this.getWinningCells(size, rowId, colId,
+            hasRowWin, hasColWin, hasMainDiagWin, hasAntiDiagWin));
+    }
+    //Helper method to calculate coordinates of winning cells
+    getWinningCells(size, rowId, colId, rowWin, colWin, mainDiagWin, antiDiagWin) {
+        if (rowWin) return Array.from({length: size}, (_, col) => [rowId, col]);
+        if (colWin) return Array.from({length: size}, (_, row) => [row, colId]);
+        if (mainDiagWin) return Array.from({length: size}, (_, i) => [i, i]);
+        if (antiDiagWin) return Array.from({length: size}, (_, i) => [i, size-1-i]);
+        return null;
+    }
+    isValidMove(row, col) {
+        return row >= 0 && row < this.size &&
+            col >= 0 && col < this.size &&
+            this.field[row][col] === PLAYER_SYMBOLS.BLANK;
     }
 }
