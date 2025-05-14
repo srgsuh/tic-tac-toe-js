@@ -1,5 +1,5 @@
 'use strict';
-const PLAYER_SYMBOLS = {
+const GAME_SYMBOLS = {
     X: 'X',
     O: 'O',
     BLANK: ''
@@ -40,8 +40,8 @@ class TicTacToe {
     init(fieldSize) {
         this.size = fieldSize;
         this.emptyCells = this.size * this.size
-        this.field = Array.from({length: this.size}, () => Array(this.size).fill(PLAYER_SYMBOLS.BLANK));
-        [this.currentPlayer, this.idlePlayer] = [PLAYER_SYMBOLS.X, PLAYER_SYMBOLS.O];
+        this.field = Array.from({length: this.size}, () => Array(this.size).fill(GAME_SYMBOLS.BLANK));
+        [this.currentPlayer, this.idlePlayer] = [GAME_SYMBOLS.X, GAME_SYMBOLS.O];
     }
     switchPlayers () {
         [this.currentPlayer, this.idlePlayer] = [this.idlePlayer, this.currentPlayer];
@@ -90,6 +90,6 @@ class TicTacToe {
     isValidMove(row, col) {
         return row >= 0 && row < this.size &&
             col >= 0 && col < this.size &&
-            this.field[row][col] === PLAYER_SYMBOLS.BLANK;
+            this.field[row][col] === GAME_SYMBOLS.BLANK;
     }
 }

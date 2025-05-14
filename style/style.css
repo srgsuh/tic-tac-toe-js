@@ -7,12 +7,8 @@ body {
     height: 100vh;
     background-color: navajowhite;
 }
-#log-text{
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
-    font-size: larger;
-    color: darkblue;
-}
-#field {
+
+.field {
     width: 750px;
     height: 750px;
     display: grid;
@@ -29,6 +25,7 @@ body {
     font-size: 3rem;
     cursor: pointer;
     transition: background-color 0.2s;
+    color: black;
 }
 .cell:disabled {
     opacity: 0.75;
